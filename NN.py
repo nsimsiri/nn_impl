@@ -1,8 +1,6 @@
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plot
-import theano
-import theano.tensor as T
 import sklearn
 from sklearn.datasets import fetch_mldata
 import sklearn.datasets as sk_data
@@ -63,7 +61,7 @@ class NN():
             Out = f(np.dot(Out, w)+b)
         return Out.reshape((self.layer_sizes[-1],))
 
-    def fit(self, X, Y, epoch=100, n_minibatch=10, loss_f=mean_squared_error):
+    def fit(self, X, Y, epoch=100, n_minibatch=10, loss_f=mean_squared_error, loss_arr=None, verbose=True):
         n = len(X)
         for i in range(epoch):
             X,Y = shuffle(X,Y)
@@ -74,7 +72,10 @@ class NN():
                 self.SGD(batch_X, batch_Y, loss_f)
 
             acc_score = self.evaluate_loss(batch_X, batch_Y)
-            print "\tloss=", 1-acc_score
+            if (verbose):
+                print "\tloss=", 1-acc_score
+            if (loss_arr!=None):
+                loss_arr.append(1-acc_score)
 
     def predict(self, X):
         if (self.isClassifying):
