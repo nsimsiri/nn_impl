@@ -68,7 +68,7 @@ def loss(logits, labels):
   return tf.reduce_mean(cross_entropy, name='xentropy_mean')
 
 
-def training(loss, learning_rate):
+def training(loss, learning_rate, optimizer=None, momentum=0.9):
   """Sets up the training Ops.
   Creates a summarizer to track the loss over time in TensorBoard.
   Creates an optimizer and applies the gradients to all trainable variables.
@@ -83,12 +83,20 @@ def training(loss, learning_rate):
   # Add a scalar summary for the snapshot loss.
   tf.summary.scalar('loss', loss)
   # Create the gradient descent optimizer with the given learning rate.
-  optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+  _optimizer = None      
+  if (optimizer == "adagrad"):
+      _optimizer = tf.train.AdagradOptimizer(learning_rate=learning_rate)
+  elif (optimizer == "adam"):
+      _optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+  elif (optimizer == "momentum"):
+      _optimizer = tf.train.MomentumOptimizer(learning_rate, momentum)
+  else:
+      _optimizer = tf.train.GradientDescentOptimizer(learning_rate)
   # Create a variable to track the global step.
   #global_step = tf.Variable(0, name='global_step', trainable=False)
   # Use the optimizer to apply the gradients that minimize the loss
   # (and also increment the global step counter) as a single training step.
-  train_op = optimizer.minimize(loss)
+  train_op = _optimizer.minimize(loss)
   return train_op
 
 
